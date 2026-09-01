@@ -15,7 +15,13 @@ export default defineAgent({
   },
   runtime: "local",
   hosting: {
-    egressDomains: ["mcp.atlassian.com", jiraHost, "slack.com", "api.github.com"],
+    egressDomains: [
+      "mcp.atlassian.com",
+      jiraHost,
+      "slack.com",
+      "api.github.com",
+      "api.cursor.com",
+    ],
     secretNames: [
       "TRIAGE_SLACK_BOT_TOKEN",
       "TRIAGE_SLACK_APP_TOKEN",
@@ -26,6 +32,8 @@ export default defineAgent({
       "JIRA_PROJECT_KEY",
       "TRIAGE_INTERNAL_SLACK_CHANNEL",
       "TRIAGE_APPROVER_SLACK_USER_IDS",
+      "ENGINEER_MCP_URL",
+      "ENGINEER_ALIAS_TOKEN",
     ],
   },
 });

@@ -20,26 +20,33 @@ agent-sdk deployment engineer
 agent-sdk deployment triage
 ```
 
-## Peer MCP requirement
+## Engineer delegation across deployments
 
-`triage` delegates to `engineer` through a **peer MCP connection**
-(`agent/mcp-connections/engineer.ts`). Peer slugs resolve to agents mounted
-on the **same serve process** (`/engineer/v1/mcp` on loopback).
+`triage` delegates to `engineer` through the connection in
+`triage/agent/mcp-connections/engineer.ts`, which picks its transport from
+the environment:
 
-Separate Cursor deployments do **not** share a process. For full end-to-end
-peer delegation (repro + fix), either:
+- **Hosted (managed hosting, no self-host needed):** every deployed agent
+  serves its `ask` / `check` MCP surface over HTTPS at
+  `<alias>/v1/mcp`, gated by the alias token. Set two secrets on the
+  `triage` deployment and the connection becomes a plain remote MCP URL:
 
-1. **Self-host both agents together** (recommended for E2E):
+  ```bash
+  # <alias> from `agent-sdk deployment engineer`; token from first deploy
+  # (or `agent-sdk rotate-token engineer`)
+  agent-sdk secrets set triage ENGINEER_MCP_URL ENGINEER_ALIAS_TOKEN
+  agent-sdk deploy --dir . --slug triage
+  ```
 
-   ```bash
-   npm run dev   # agent-sdk serve --dir . --dev
-   ```
+  `ENGINEER_MCP_URL` = `<engineer alias>/v1/mcp`. Egress to
+  `api.cursor.com` is declared in `triage/agent/agent.ts`.
 
-2. **Hosted split** — engineer cloud turns work standalone; triage hosted
-   deployment can still run Slack/Jira flows but `engineer.ask` will not
-   reach a separate hosted `engineer` deployment until cross-host peer
-   routing exists. Plan for self-host or co-located serve for production
-   peer delegation.
+- **Local dev:** with no `ENGINEER_MCP_URL` set, the connection falls back
+  to the peer-slug form (`{ agent: "engineer" }`), which resolves over
+  loopback when both agents run in one `npm run dev` serve process.
+
+Both transports expose the identical stateless `ask` / `check` tools, so
+instructions and evals do not change between environments.
 
 ## Secrets (triage deployment)
 
