@@ -1,0 +1,17 @@
+{
+  "name": "engineer",
+  "private": true,
+  "type": "module",
+  "description": "Cloud Grafana engineer: reproduction and fork-targeted fixes against jgrace19/grafana.",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "dev": "agent-sdk dev"
+  },
+  "dependencies": {
+    "@cursor/july": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.0"
+  }
+}

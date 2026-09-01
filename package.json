@@ -1,0 +1,16 @@
+{
+  "name": "grafana-triage-agent",
+  "private": true,
+  "type": "module",
+  "description": "Multi-agent Grafana bug triage system: Slack intake, Jira filing, approval polling, and cloud-engineered fixes.",
+  "scripts": {
+    "check": "npm run check --prefix triage && npm run check --prefix engineer",
+    "test": "npm run test --prefix triage",
+    "validate": "npx agent-sdk validate --dir triage && npx agent-sdk validate --dir engineer",
+    "eval": "npx agent-sdk eval --dir triage --list",
+    "dev": "npx agent-sdk serve --dir . --dev"
+  },
+  "devDependencies": {
+    "@cursor/july": "latest"
+  }
+}

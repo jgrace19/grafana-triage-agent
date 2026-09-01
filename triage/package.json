@@ -1,0 +1,20 @@
+{
+  "name": "triage",
+  "private": true,
+  "type": "module",
+  "description": "Grafana bug triage orchestrator: Slack intake, Jira filing, approval polling, engineer delegation.",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "dev": "agent-sdk dev"
+  },
+  "dependencies": {
+    "@cursor/july": "latest",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.4"
+  }
+}
