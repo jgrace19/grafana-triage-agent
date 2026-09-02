@@ -7,7 +7,7 @@ import { defineConnection } from "@cursor/july/connections";
  * credentials for hosting with `--store`.
  */
 export default defineConnection({
-  url: "https://mcp.atlassian.com/v1/sse",
+  url: "https://mcp.atlassian.com/v1/mcp",
   oauth: true,
   description:
     "Create Jira issues and post triage or PR-link comments in the configured Jira project.",

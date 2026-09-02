@@ -1,6 +1,6 @@
 import { defineAgent } from "@cursor/july";
 
-const jiraSite = process.env.JIRA_SITE_URL ?? "example.atlassian.net";
+const jiraSite = process.env.JIRA_SITE_URL ?? "fe-anysphere-demo.atlassian.net";
 const jiraHost = jiraSite.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
 export default defineAgent({
