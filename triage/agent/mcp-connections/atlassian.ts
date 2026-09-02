@@ -11,4 +11,5 @@ export default defineConnection({
   oauth: true,
   description:
     "Create Jira issues and post triage or PR-link comments in the configured Jira project.",
+  advertiseTools: true,
 });
