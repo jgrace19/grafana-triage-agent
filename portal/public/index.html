@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GrafDesk — Support</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div>
+          <div class="brand-name">GrafDesk</div>
+          <div class="brand-sub">Grafana Support</div>
+        </div>
+      </div>
+      <nav>
+        <button class="nav-item active" data-view="tickets">
+          Tickets <span id="ticket-count" class="count"></span>
+        </button>
+        <button class="nav-item" data-view="approvals">
+          Review Queue <span id="approval-count" class="count"></span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div id="agent-status" class="agent-status">agent: …</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- Ticket list -->
+      <section id="view-tickets" class="view">
+        <header class="view-header">
+          <h1>Tickets</h1>
+          <button id="btn-new-ticket" class="btn primary">New ticket</button>
+        </header>
+        <table class="ticket-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Subject</th><th>Requester</th>
+              <th>Priority</th><th>Status</th><th>Updated</th>
+            </tr>
+          </thead>
+          <tbody id="ticket-rows"></tbody>
+        </table>
+        <div id="tickets-empty" class="empty hidden">
+          No tickets yet. Open one to start a triage session.
+        </div>
+      </section>
+
+      <!-- New ticket -->
+      <section id="view-new" class="view hidden">
+        <header class="view-header"><h1>New ticket</h1></header>
+        <form id="new-ticket-form" class="card form">
+          <label>Subject
+            <input name="subject" required placeholder="Explore graph legend overlaps axis" />
+          </label>
+          <label>Requester
+            <input name="reporter" placeholder="jane@acme.com" />
+          </label>
+          <label>Priority
+            <select name="priority">
+              <option value="low">Low</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </label>
+          <label>Description
+            <textarea name="description" required rows="8"
+              placeholder="Grafana version, panel/datasource type, steps to reproduce, expected vs actual…"></textarea>
+          </label>
+          <div class="form-actions">
+            <button type="button" class="btn" id="btn-cancel-new">Cancel</button>
+            <button type="submit" class="btn primary">Submit ticket</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Ticket detail -->
+      <section id="view-detail" class="view hidden">
+        <header class="view-header">
+          <button class="btn" id="btn-back">&larr; Tickets</button>
+          <div class="detail-title">
+            <h1 id="detail-subject"></h1>
+            <div class="detail-meta" id="detail-meta"></div>
+          </div>
+        </header>
+        <div id="working-banner" class="working hidden">
+          <span class="spinner"></span>
+          <span id="working-label">Triage agent is working…</span>
+        </div>
+        <div id="conversation" class="conversation"></div>
+        <form id="reply-form" class="composer">
+          <textarea id="reply-text" rows="3" placeholder="Reply to the triage agent…"></textarea>
+          <button type="submit" class="btn primary">Send</button>
+        </form>
+      </section>
+
+      <!-- Approvals -->
+      <section id="view-approvals" class="view hidden">
+        <header class="view-header"><h1>Review Queue</h1></header>
+        <p class="hint">
+          Fixes queued by the triage agent. Approving dispatches engineering
+          on the deployed cloud agent and opens a PR against
+          <code>jgrace19/grafana</code>.
+        </p>
+        <div id="approval-cards"></div>
+        <div id="approvals-empty" class="empty hidden">
+          Nothing waiting for review.
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -4,10 +4,7 @@ import type { ApprovalStatus, HostKv, PendingApproval } from "./types.js";
 const INDEX_KEY = "pending-approvals/index";
 
 export function createPendingApproval(
-  input: Omit<
-    PendingApproval,
-    "id" | "status" | "createdAt" | "updatedAt"
-  >
+  input: Omit<PendingApproval, "id" | "status" | "createdAt" | "updatedAt">
 ): PendingApproval {
   const now = new Date().toISOString();
   return {
@@ -28,9 +25,7 @@ export async function listPendingApprovals(
   }
 
   const items = await Promise.all(
-    ids.map(async (id) =>
-      kv.get(`pending-approvals/${id}`)
-    )
+    ids.map(async (id) => kv.get(`pending-approvals/${id}`))
   );
 
   return items.filter(
@@ -63,10 +58,15 @@ export async function updatePendingApproval(
   });
 }
 
+/**
+ * Status-gated claim: only a still-pending record transitions, so a retried
+ * or concurrent approve call cannot dispatch the same fix twice.
+ */
 export async function claimPendingApproval(
   kv: HostKv,
   id: string,
-  nextStatus: ApprovalStatus
+  nextStatus: ApprovalStatus,
+  patch?: Partial<Pick<PendingApproval, "approvedBy">>
 ): Promise<PendingApproval | null> {
   const current = (await kv.get(`pending-approvals/${id}`)) as
     | PendingApproval
@@ -78,6 +78,7 @@ export async function claimPendingApproval(
 
   const updated: PendingApproval = {
     ...current,
+    ...patch,
     status: nextStatus,
     updatedAt: new Date().toISOString(),
   };

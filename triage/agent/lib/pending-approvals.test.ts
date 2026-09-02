@@ -22,11 +22,8 @@ function sampleApproval(): PendingApproval {
   return createPendingApproval({
     jiraKey: "GRAF-1",
     jiraUrl: "https://example.atlassian.net/browse/GRAF-1",
-    slackChannel: "CINTERNAL",
-    messageTs: "1000.1",
-    customerChannel: "CCUSTOMER",
-    customerThreadTs: "2000.1",
-    customerContinuationToken: "CCUSTOMER:2000.1",
+    ticketId: "TCK-1001",
+    continuationToken: "ticket:TCK-1001",
     triageSummary: "Explore graph labels truncate on narrow panels.",
   });
 }

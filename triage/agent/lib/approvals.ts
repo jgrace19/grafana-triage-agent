@@ -1,5 +1,3 @@
-import type { SlackReaction } from "./types.js";
-
 export function parseApproverAllowlist(
   raw: string | undefined
 ): Set<string> | null {
@@ -15,37 +13,24 @@ export function parseApproverAllowlist(
   );
 }
 
-export function hasThumbsUpApproval(
-  reactions: SlackReaction[] | undefined,
+export function isApproverAllowed(
+  approver: string,
   allowlist: Set<string> | null
 ): boolean {
-  if (reactions === undefined || reactions.length === 0) {
-    return false;
-  }
-
-  const thumbsUp = reactions.find(
-    (reaction) => reaction.name === "+1" || reaction.name === "thumbsup"
-  );
-
-  const users = thumbsUp?.users ?? [];
-  if (users.length === 0) {
-    return false;
-  }
-
   if (allowlist === null) {
     return true;
   }
-
-  return users.some((userId) => allowlist.has(userId));
+  return allowlist.has(approver);
 }
 
 export function buildFixDirective(input: {
   jiraKey: string;
   jiraUrl: string;
   triageSummary: string;
+  approvedBy: string;
 }): string {
   return [
-    "An internal approver reacted with :+1:. Implement the approved fix now.",
+    `An internal reviewer (${input.approvedBy}) approved the fix. Implement it now.`,
     "",
     `Jira: ${input.jiraKey}`,
     `Link: ${input.jiraUrl}`,
@@ -57,7 +42,6 @@ export function buildFixDirective(input: {
     "1. Delegate to the engineer peer with a full fix brief.",
     "2. Poll engineer.check until the PR is open against jgrace19/grafana.",
     "3. Comment the PR link on the Jira issue.",
-    "4. Reply in this customer thread and on the internal approval thread with the PR link.",
-    "5. Mark the approval record completed via post_internal_review follow-up in storage only if needed.",
+    "4. Reply in this ticket thread with the PR link and a one-line change summary.",
   ].join("\n");
 }
