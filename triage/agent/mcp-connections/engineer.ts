@@ -24,8 +24,10 @@ export default remoteUrl !== undefined && remoteUrl !== ""
       url: remoteUrl,
       headers: { "X-Agent-Alias-Token": aliasToken ?? "" },
       description,
+      advertiseTools: true,
     })
   : defineConnection({
       agent: "engineer",
       description,
+      advertiseTools: true,
     });
