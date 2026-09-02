@@ -1,0 +1,12 @@
+{
+  "name": "portal",
+  "private": true,
+  "type": "module",
+  "description": "GrafDesk: local Zendesk-style ticket portal that fronts the deployed triage agent over its HTTP API.",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

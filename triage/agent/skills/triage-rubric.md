@@ -58,18 +58,19 @@ Evidence: <what engineer observed>
 Next step: <awaiting approval | needs reporter input>
 ```
 
-## Slack reply contracts
+## Ticket reply contracts
 
-- **Clarification:** numbered missing fields; remind reporter to reply
-  in-thread and @mention the bot.
+- **Clarification:** numbered missing fields; the customer replies on the
+  ticket and the answer arrives in this session.
 - **Repro failed:** bullet what was tried; ask for logs, dashboard JSON,
   or crisper steps.
 - **Filed:** Jira key + link, severity, component, repro status.
+- **Awaiting approval:** say the fix is queued for internal review.
 - **Fix shipped:** PR link + one-line change summary.
 
 ## Idempotency
 
-- One Jira issue per customer thread unless the reporter explicitly
-  opens a new top-level report.
-- One internal approval post per Jira key.
+- One Jira issue per ticket unless the reporter explicitly opens a new
+  ticket.
+- One internal approval entry per Jira key.
 - One fix PR per approved Jira key.

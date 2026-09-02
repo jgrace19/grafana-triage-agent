@@ -11,7 +11,7 @@ agent-sdk deploy --dir . --all
 Deployments created from `jgrace19/grafana-triage-agent@main`:
 
 - `engineer` — cloud runtime, `jgrace19/grafana` checkout
-- `triage` — local runtime, Slack/Jira/approval orchestration
+- `triage` — local runtime, ticket intake / Jira / approval orchestration
 
 Check status:
 
@@ -52,11 +52,9 @@ instructions and evals do not change between environments.
 
 ```bash
 agent-sdk secrets set triage \
-  TRIAGE_SLACK_BOT_TOKEN \
-  TRIAGE_SLACK_APP_TOKEN \
   JIRA_SITE_URL \
   JIRA_PROJECT_KEY \
-  TRIAGE_INTERNAL_SLACK_CHANNEL
+  TRIAGE_APPROVER_IDS
 
 agent-sdk mcp oauth atlassian --dir ./triage --store --slug triage
 agent-sdk deploy --dir . --slug triage
@@ -65,20 +63,30 @@ agent-sdk deploy --dir . --slug triage
 Update `hosting.egressDomains` in `triage/agent/agent.ts`: replace
 `example.atlassian.net` with your real Jira hostname (no scheme).
 
-## Slack provisioning
+## Ticket portal
 
-Preferred (Add to Slack enrolled):
+Intake runs through the `tickets` channel
+(`triage/agent/channels/tickets.ts`), exposed on the deployment at
+`<triage alias>/v1/channels/tickets/*` behind the alias token:
+
+| Route | Purpose |
+| --- | --- |
+| `POST /report` | Open a ticket; starts a `ticket:<id>` session |
+| `POST /followup` | Append a customer reply to that session |
+| `GET /pending` | List fixes awaiting internal approval |
+| `POST /approve` | Approve; dispatches the fix directive into the session |
+
+Run the local GrafDesk UI against the deployment:
 
 ```bash
-agent-sdk slack create --dir ./triage --channel-posts
+TRIAGE_AGENT_URL="<triage alias URL>" \
+TRIAGE_ALIAS_TOKEN="<triage alias token>" \
+node portal/server.mjs
+# http://127.0.0.1:4000
 ```
 
-Fallback manifests (generated locally, gitignored):
-
-```bash
-agent-sdk slack manifest --env both --prefix TRIAGE --dir ./triage
-# import .agent-serve/slack/manifest.{dev,prod}.json at api.slack.com
-```
+The portal keeps the alias token server-side and renders agent replies by
+tailing `GET <alias>/v1/session/:id/stream?startIndex=N`.
 
 ## Smoke (local)
 
@@ -86,9 +94,7 @@ agent-sdk slack manifest --env both --prefix TRIAGE --dir ./triage
 agent-sdk login
 npm run dev
 # playground: http://127.0.0.1:3000/triage/playground
-
-# manual approval poll in dev:
-curl -X POST http://127.0.0.1:3000/triage/v1/dev/schedules/approval-poll
+TRIAGE_AGENT_URL="http://127.0.0.1:3000/triage" node portal/server.mjs
 ```
 
 ## Evals

@@ -7,48 +7,25 @@ import {
 
 export default defineTool({
   description:
-    "Post an internal approval request to the triage-internal Slack channel and record pending approval state.",
+    "Queue a fix for internal human approval. Records the Jira issue and triage summary in the review queue shown in the ticket portal; a reviewer approves it there, which dispatches the fix directive back into this ticket session.",
   inputSchema: z.object({
     jiraKey: z.string().min(1),
     jiraUrl: z.string().url(),
-    triageSummary: z.string().min(1),
-    customerChannel: z.string().min(1),
-    customerThreadTs: z.string().min(1),
-    customerContinuationToken: z.string().min(1),
+    triageSummary: z
+      .string()
+      .min(1)
+      .describe("Severity, component, hypothesis, and repro evidence."),
+    ticketId: z.string().min(1).describe("The portal ticket id, e.g. TCK-1001."),
   }),
   async execute(input, ctx) {
-    const internalChannel =
-      process.env.TRIAGE_INTERNAL_SLACK_CHANNEL ??
-      "#grafana-bug-triage-internal";
-
-    const client = await ctx.host.slack.getClient();
-    const text = [
-      `*Approval needed:* ${input.jiraKey}`,
-      input.jiraUrl,
-      "",
-      input.triageSummary,
-      "",
-      "React with :+1: to approve the automated fix.",
-    ].join("\n");
-
-    const result = await client.chat.postMessage({
-      channel: internalChannel,
-      text,
-      unfurl_links: false,
-    });
-
-    if (result.channel === undefined || result.ts === undefined) {
-      throw new Error("Slack postMessage did not return channel/ts");
-    }
+    const continuationToken =
+      ctx.session.continuationKey ?? `ticket:${input.ticketId}`;
 
     const approval = createPendingApproval({
       jiraKey: input.jiraKey,
       jiraUrl: input.jiraUrl,
-      slackChannel: result.channel,
-      messageTs: result.ts,
-      customerChannel: input.customerChannel,
-      customerThreadTs: input.customerThreadTs,
-      customerContinuationToken: input.customerContinuationToken,
+      ticketId: input.ticketId,
+      continuationToken,
       triageSummary: input.triageSummary,
     });
 
@@ -56,10 +33,10 @@ export default defineTool({
 
     return {
       approvalId: approval.id,
-      channel: result.channel,
-      ts: result.ts,
-      jiraKey: input.jiraKey,
+      jiraKey: approval.jiraKey,
+      ticketId: approval.ticketId,
       status: approval.status,
+      note: "Pending human approval in the portal review queue. Do not implement the fix until an approval directive arrives.",
     };
   },
 });
